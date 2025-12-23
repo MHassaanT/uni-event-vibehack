@@ -9,14 +9,39 @@ export default function EventPage() {
   const params = useParams()
   const router = useRouter()
   const [event, setEvent] = useState<Event | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const events = loadEvents()
-    const found = events.find(e => e.id === params.id)
-    if (found) {
-      setEvent(found)
+    // Create an async function inside useEffect
+    const fetchEvent = async () => {
+      try {
+        setLoading(true)
+        // Await the promise to get the actual array of events
+        const events = await loadEvents() 
+        const found = events.find(e => e.id === params.id)
+        
+        if (found) {
+          setEvent(found)
+        }
+      } catch (error) {
+        console.error("Error loading event:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (params.id) {
+      fetchEvent()
     }
   }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   if (!event) {
     return (
