@@ -1,6 +1,6 @@
-import { initializeApp, getApps } from 'firebase/app'
+import { initializeApp, getApps, FirebaseApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore' // Added this
+import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,12 +11,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 }
 
-let app
-if (typeof window !== 'undefined' && !getApps().length) {
-  app = initializeApp(firebaseConfig)
-} else if (typeof window !== 'undefined') {
-  app = getApps()[0]
-}
+// 1. Initialize the app correctly for both Server and Client sides
+const app: FirebaseApp = getApps().length === 0 
+  ? initializeApp(firebaseConfig) 
+  : getApps()[0];
 
-export const auth = typeof window !== 'undefined' ? getAuth(app) : null as any
-export const db = typeof window !== 'undefined' ? getFirestore(app) : null as any // Added this
+// 2. Export Auth and Firestore
+// We use "as any" or conditional exports to handle Next.js Server Components if necessary,
+// but for your Client-side setup, this is the safest standard way:
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export { app };
