@@ -8,7 +8,6 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event, userPreferences }: EventCardProps) {
-  // Calculate days until event
   const now = new Date()
   const eventDate = new Date(event.date)
   const daysUntil = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
@@ -17,66 +16,49 @@ export default function EventCard({ event, userPreferences }: EventCardProps) {
   const isPopular = (event.popularityScore || 0) >= 8
   const isRecommended = userPreferences.includes(event.category)
 
-  // Format date
   const formattedDate = eventDate.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
+    weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
   })
 
   return (
     <Link href={`/event/${event.id}`}>
-      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6 border border-gray-100 cursor-pointer h-full flex flex-col">
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-3">
+      <div className="group relative bg-white/[0.03] border border-white/5 rounded-2xl p-6 transition-all duration-500 hover:bg-white/[0.06] hover:border-blue-500/30 hover:shadow-[0_0_30px_rgba(37,99,235,0.1)] cursor-pointer h-full flex flex-col overflow-hidden">
+        {/* Animated Glow on Hover */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
+        
+        <div className="relative flex flex-wrap gap-2 mb-4">
           {isHappeningSoon && (
-            <span className="px-2 py-1 bg-orange-100 text-orange-700 text-xs font-medium rounded-full">
-              ⏰ Happening Soon
+            <span className="px-2.5 py-1 bg-orange-500/10 text-orange-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-orange-500/20">
+              ⏰ Soon
             </span>
           )}
           {isPopular && (
-            <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+            <span className="px-2.5 py-1 bg-red-500/10 text-red-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-red-500/20">
               🔥 Popular
             </span>
           )}
           {isRecommended && (
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-              ⭐ Recommended
+            <span className="px-2.5 py-1 bg-blue-500/10 text-blue-400 text-[10px] font-bold uppercase tracking-wider rounded-md border border-blue-500/20">
+              ⭐ Pick
             </span>
           )}
         </div>
 
-        {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="relative text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
           {event.title}
         </h3>
 
-        {/* AI Summary */}
-        <AiSummary description={event.description} />
-
-        {/* Meta info */}
-        <div className="mt-4 space-y-2 text-sm text-gray-600">
-          <div className="flex items-center">
-            <span className="font-medium mr-2">📅</span>
-            {formattedDate}
-          </div>
-          <div className="flex items-center">
-            <span className="font-medium mr-2">🏷️</span>
-            {event.category}
-          </div>
-          <div className="flex items-center">
-            <span className="font-medium mr-2">👤</span>
-            {event.organizer}
-          </div>
+        <div className="relative mb-4 opacity-80">
+          <AiSummary description={event.description} />
         </div>
 
-        {/* Spacer */}
-        <div className="flex-grow"></div>
-
-        {/* View details */}
-        <div className="mt-4 text-blue-600 font-medium text-sm hover:underline">
-          View Details →
+        <div className="relative mt-auto pt-4 border-t border-white/5 space-y-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2">
+            <span className="text-blue-500/80">📅</span> {formattedDate}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-blue-500/80">🏷️</span> {event.category}
+          </div>
         </div>
       </div>
     </Link>
