@@ -1,79 +1,80 @@
-// Only showing the return section for brevity, apply to page (7).tsx
-return (
-  <div className="min-h-screen bg-[#0a0a0c] text-white">
-    {/* Background Detail Accent */}
-    <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-blue-600/10 blur-[150px] -z-10" />
-    
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <button
-        onClick={() => router.push('/')}
-        className="group mb-12 text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest"
-      >
-        <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Discovery
-      </button>
+'use client'
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left Column: Title & Content */}
-        <div className="lg:col-span-2 space-y-8">
-          <div>
-            <span className="px-3 py-1 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 inline-block">
-              {event.category}
-            </span>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tighter mb-6 leading-tight">
-              {event.title}
-            </h1>
-            <AiSummary description={event.description} isDetailPage />
-          </div>
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import EventDetail from '@/components/EventDetail'
+import { loadEvents, Event } from '@/lib/events'
 
-          <div className="prose prose-invert max-w-none">
-            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-              <div className="w-1 h-6 bg-blue-600" /> Event Briefing
-            </h2>
-            <p className="text-gray-400 leading-relaxed text-lg font-light">
-              {event.description}
-            </p>
-          </div>
-        </div>
+export default function EventPage() {
+  const params = useParams()
+  const router = useRouter()
+  const [event, setEvent] = useState<Event | null>(null)
+  const [loading, setLoading] = useState(true)
 
-        {/* Right Column: Actions & Meta */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-24 bg-white/[0.03] border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
-            <div className="space-y-6 mb-8">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Date & Time</p>
-                <p className="text-lg font-medium">{formattedDate}</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Hosted By</p>
-                <p className="text-lg font-medium text-blue-400">{event.organizer}</p>
-              </div>
-            </div>
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        setLoading(true)
+        const events = await loadEvents() 
+        const found = events.find(e => e.id === params.id)
+        if (found) {
+          setEvent(found)
+        }
+      } catch (error) {
+        console.error("Error loading event:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={toggleInterested}
-                className={`w-full py-4 rounded-xl font-bold transition-all ${
-                  interested 
-                    ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' 
-                    : 'bg-white/5 text-white hover:bg-white/10'
-                }`}
-              >
-                {interested ? '★ Watchlisted' : '☆ Add to Watchlist'}
-              </button>
-              <button
-                onClick={toggleGoing}
-                className={`w-full py-4 rounded-xl font-bold transition-all ${
-                  going 
-                    ? 'bg-blue-600 text-white shadow-[0_0_25px_rgba(37,99,235,0.4)]' 
-                    : 'bg-blue-600/80 text-white hover:bg-blue-600'
-                }`}
-              >
-                {going ? '✓ You are going' : 'Confirm Attendance'}
-              </button>
-            </div>
-          </div>
+    if (params.id) {
+      fetchEvent()
+    }
+  }, [params.id])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center">
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-blue-500/20" />
+          <div className="absolute inset-0 rounded-full border-t-2 border-blue-500 animate-spin" />
         </div>
       </div>
+    )
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0c] flex items-center justify-center text-center">
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-4">Event not found</h2>
+          <button
+            onClick={() => router.push('/')}
+            className="text-blue-500 hover:text-blue-400 font-bold uppercase tracking-widest text-xs"
+          >
+            ← Back to Discovery
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0c] text-white selection:bg-blue-500/30">
+      {/* Background Detail Accent */}
+      <div className="fixed top-0 right-0 w-[50%] h-[50%] bg-blue-600/10 blur-[150px] -z-10" />
+      
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <button
+          onClick={() => router.push('/')}
+          className="group mb-12 text-gray-500 hover:text-blue-400 transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest"
+        >
+          <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Discovery
+        </button>
+
+        {/* Pass the event data to the detailed component */}
+        <EventDetail event={event} />
+      </div>
     </div>
-  </div>
-)
+  )
+}
