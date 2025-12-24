@@ -11,7 +11,6 @@ export default function AuthGate() {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isSignUp, setIsSignUp] = useState(false)
   const [error, setError] = useState('')
   const [useMockMode, setUseMockMode] = useState(false)
 
@@ -31,7 +30,8 @@ export default function AuthGate() {
     setError('')
     
     try {
-      await signInWithEmail(email, password, isSignUp)
+      // Force isSignUp to false so it only attempts login
+      await signInWithEmail(email, password, false)
     } catch (err: any) {
       setError(err.message || 'Authentication failed')
     }
@@ -59,7 +59,6 @@ export default function AuthGate() {
     setUser({ email: 'mock@demo.com' } as User)
   }
 
-  // Show loading state
   if (loading && !useMockMode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
@@ -71,7 +70,6 @@ export default function AuthGate() {
     )
   }
 
-  // Show admin panel if authenticated
   if (user || useMockMode) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -111,7 +109,6 @@ export default function AuthGate() {
     )
   }
 
-  // Show sign-in form
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
@@ -164,17 +161,11 @@ export default function AuthGate() {
               type="submit"
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
             >
-              {isSignUp ? 'Sign Up' : 'Sign In'}
+              Sign In
             </button>
           </form>
 
-          <button
-            type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="w-full text-sm text-gray-600 hover:text-gray-900 mb-4"
-          >
-            {isSignUp ? 'Already have an account? Sign in' : 'Need an account? Sign up'}
-          </button>
+          {/* SIGN UP TOGGLE REMOVED FROM HERE */}
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
