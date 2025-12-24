@@ -1,11 +1,3 @@
-interface FilterBarProps {
-  categories: string[]
-  selectedCategories: string[]
-  onCategoryChange: (categories: string[]) => void
-  showUpcoming: boolean
-  onDateFilterChange: (showUpcoming: boolean) => void
-}
-
 export default function FilterBar({
   categories,
   selectedCategories,
@@ -22,66 +14,46 @@ export default function FilterBar({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-lg font-semibold mb-4 text-gray-800">🔍 Filters</h2>
-      
-      {/* Date Filter */}
-      <div className="mb-4">
-        <label className="text-sm font-medium text-gray-700 mb-2 block">
-          Timeline
-        </label>
-        <div className="flex gap-2">
-          <button
-            onClick={() => onDateFilterChange(true)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              showUpcoming
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Upcoming
-          </button>
-          <button
-            onClick={() => onDateFilterChange(false)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              !showUpcoming
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            Past
-          </button>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Timeline</h2>
+        <div className="flex flex-col gap-2">
+          {[
+            { label: 'Upcoming Events', value: true },
+            { label: 'Past Archives', value: false }
+          ].map((opt) => (
+            <button
+              key={opt.label}
+              onClick={() => onDateFilterChange(opt.value)}
+              className={`px-4 py-3 rounded-xl text-left text-sm font-medium transition-all ${
+                showUpcoming === opt.value
+                  ? 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.2)]'
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Category Filter */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-2 block">
-          Categories
-        </label>
+        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Categories</h2>
         <div className="flex flex-wrap gap-2">
           {categories.map(cat => (
             <button
               key={cat}
               onClick={() => toggleCategory(cat)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
                 selectedCategories.includes(cat)
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-indigo-600 border-indigo-500 text-white'
+                  : 'bg-white/5 border-white/5 text-gray-500 hover:border-white/20'
               }`}
             >
               {cat}
             </button>
           ))}
         </div>
-        {selectedCategories.length > 0 && (
-          <button
-            onClick={() => onCategoryChange([])}
-            className="mt-2 text-sm text-gray-600 hover:text-gray-900 underline"
-          >
-            Clear all
-          </button>
-        )}
       </div>
     </div>
   )
